@@ -1,50 +1,43 @@
-name: Deploy ECS
+name: ECS Deploy
 
 on:
   push:
-    branches: [main]
-
-env:
-  AWS_REGION: us-east-1
-  ECR_REPOSITORY: devops-final-app
-  ECS_CLUSTER: devops-final-cluster
-  ECS_SERVICE: devops-final-service
-  ECS_TASK_DEFINITION: .github/ecs-task-def.json
-  CONTAINER_NAME: devops-final-app
+    branches:
+      - master   # or your default branch
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-    - uses: aws-actions/configure-aws-credentials@v4
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
+        aws-region: us-east-1
 
-    - uses: aws-actions/amazon-ecr-login@v2
+    - name: Log in to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
 
-    - name: Build and push Docker image
+    - name: Build Docker image
       run: |
-        docker build -t $ECR_REPOSITORY:latest .
-        docker tag $ECR_REPOSITORY:latest ${{ secrets.ECR_REPO }}:latest
-        docker push ${{ secrets.ECR_REPO }}:latest
+        IMAGE_TAG=${GITHUB_SHA::8}
+        docker build -t devops-final-app:$IMAGE_TAG .
+        docker tag devops-final-app:$IMAGE_TAG 599548907486.dkr.ecr.us-east-1.amazonaws.com/devops-final-app:$IMAGE_TAG
+        echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
 
-    - name: Render ECS task definition
-      id: task-def
-      uses: aws-actions/amazon-ecs-render-task-definition@v1
-      with:
-        task-definition: ${{ env.ECS_TASK_DEFINITION }}
-        container-name: ${{ env.CONTAINER_NAME }}
-        image: ${{ secrets.ECR_REPO }}:latest
+    - name: Push Docker image to ECR
+      run: |
+        docker push 599548907486.dkr.ecr.us-east-1.amazonaws.com/devops-final-app:$IMAGE_TAG
 
-    - name: Deploy ECS service
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      with:
-        task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: ${{ env.ECS_SERVICE }}
-        cluster: ${{ env.ECS_CLUSTER }}
-        wait-for-service-stability: true
+    - name: Update ECS service
+      run: |
+        aws ecs update-service \
+          --cluster devops-final-cluster \
+          --service devops-final-service \
+          --force-new-deployment
