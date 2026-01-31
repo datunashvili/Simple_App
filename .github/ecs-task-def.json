@@ -16,7 +16,7 @@
       "environment": [
         { "name": "DB_HOST", "value": "database-1.copok8cga7uk.us-east-1.rds.amazonaws.com" },
         { "name": "DB_USER", "value": "postgres" },
-        { "name": "DB_PASS", "value": "biWDf8zFa38Aw2pSxT4dAw4RLRHTtSHC" },
+        { "name": "DB_PASS", "value": "Gela123!#45" },
         { "name": "DB_NAME", "value": "postgres" },
         { "name": "DB_PORT", "value": "5432" },
         { "name": "DB_SSL", "value": "true" }
