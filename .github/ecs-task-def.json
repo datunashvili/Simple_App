@@ -20,7 +20,15 @@
         { "name": "DB_NAME", "value": "postgres" },
         { "name": "DB_PORT", "value": "5432" },
         { "name": "DB_SSL", "value": "true" }
-      ]
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/devops-final-service",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
     }
   ],
   "requiresCompatibilities": ["FARGATE"],
