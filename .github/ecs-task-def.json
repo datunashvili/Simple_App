@@ -1,0 +1,20 @@
+{
+  "family": "devops-final-task",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "devops-final-app",
+      "image": "599548907486.dkr.ecr.us-east-1.amazonaws.com/devops-final-app:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "hostPort": 3000
+        }
+      ]
+    }
+  ],
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512"
+}
