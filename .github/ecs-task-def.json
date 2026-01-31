@@ -1,6 +1,7 @@
 {
   "family": "devops-final-task",
   "networkMode": "awsvpc",
+  "executionRoleArn": "arn:aws:iam::599548907486:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
       "name": "devops-final-app",
